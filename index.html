@@ -218,7 +218,7 @@
                 <button class="btn-icon" onclick="toggleTheme()" id="themeToggleBtnSetup">🌞</button>
             </div>
             <!-- Logo: Please add logo.png file to root directory -->
-            <img src="logo.png" alt="Tính Điểm Phỏm Logo" class="game-logo" onerror="this.style.display='none'">
+            <img src="logo.png" alt="Tính Điểm Phỏm Logo" class="game-logo" onerror="this.style.display='none'; this.setAttribute('aria-hidden', 'true');" aria-hidden="false">
             
             <h1 style="color: var(--color-nhat); margin-top: 40px;">♠ Tá Lả Pro ♥</h1>
             <p style="color: var(--text-muted);">Nhập tên 4 người chơi</p>
