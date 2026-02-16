@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <base target="_top">
+    <style>
+        /* Biến CSS mặc định (Chế độ Tối) */
+        :root {
+            --bg-main: #131420;
+            --bg-card: #1f2235;
+            --text-main: #ffffff;
+            --text-muted: #8b92b2;
+            --border: #2f3453;
+            
+            --color-nhat: #f1c40f;
+            --color-nhi: #bdc3c7;
+            --color-ba: #d35400;
+            --color-bet: #7f8c8d;
+            --color-u: #2ecc71;
+            --color-uden: #f39c12;
+            --color-mom: #e74c3c;
+            --color-an: #3498db;
+            --color-anchot: #9b59b6;
+        }
+
+        /* Biến CSS khi bật Chế độ Sáng */
+        [data-theme="light"] {
+            --bg-main: #f0f2f5;
+            --bg-card: #ffffff;
+            --text-main: #1c1e21;
+            --text-muted: #65676b;
+            --border: #ccd0d5;
+            
+            --color-nhi: #7f8c8d; 
+        }
+
+        * { box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            margin: 0;
+            padding: 0;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .text-positive { color: #2ecc71; font-weight: bold; }
+        .text-negative { color: #e74c3c; font-weight: bold; }
+        .text-zero { color: var(--text-muted); }
+        .hidden { display: none !important; }
+
+        .container { padding: 15px; max-width: 500px; margin: 0 auto; }
+        
+        .setup-input {
+            width: 100%; padding: 15px; margin-bottom: 15px;
+            background: var(--bg-card); border: 1px solid var(--border);
+            color: var(--text-main); border-radius: 8px; font-size: 16px;
+        }
+        
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .header h2 { margin: 0; font-size: 1.5em; }
+        .header-actions { display: flex; gap: 8px; }
+        .btn-icon { 
+            background: var(--bg-card); border: 1px solid var(--border); 
+            color: var(--text-main); padding: 10px; border-radius: 8px; 
+            cursor: pointer; font-size: 1.1em; transition: 0.2s;
+        }
+
+        .score-board {
+            background: var(--bg-card); border-radius: 12px; padding: 15px; margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        .score-row {
+            display: flex; justify-content: space-between; padding: 12px 0;
+            border-bottom: 1px solid var(--border); font-size: 1.1em;
+        }
+        .score-row:last-child { border-bottom: none; }
+        .score-row .name { font-weight: 500; }
+
+        .section-title { font-size: 1.1em; color: var(--text-muted); margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1px; font-weight: 600;}
+        .card { background: var(--bg-card); border-radius: 12px; padding: 15px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);}
+        
+        .game-types { display: flex; gap: 10px; margin-bottom: 15px; }
+        .type-btn {
+            flex: 1; padding: 12px; border: 1px solid var(--border); border-radius: 8px;
+            background: var(--bg-main); color: var(--text-muted); text-align: center; font-weight: bold; cursor: pointer; transition: 0.2s;
+        }
+        .type-btn.active { background: var(--color-u); color: #fff; border-color: var(--color-u); }
+        .type-btn[data-type="uden"].active { background: var(--color-uden); border-color: var(--color-uden); }
+
+        .player-select-row {
+            display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;
+        }
+        select {
+            background: var(--bg-main); color: var(--text-main); border: 1px solid var(--border);
+            padding: 10px; border-radius: 8px; font-size: 15px; width: 140px; outline: none;
+        }
+
+        .event-row {
+            display: flex; gap: 5px; margin-bottom: 10px; align-items: center; background: var(--bg-main); padding: 8px; border-radius: 8px;
+        }
+        .event-row select { width: auto; flex: 1; padding: 8px 4px; font-size: 14px; }
+        .btn-remove-event { background: var(--color-mom); border: none; color: white; padding: 8px 12px; border-radius: 6px; }
+        .btn-add-event { background: var(--bg-main); border: 1px dashed var(--border); color: var(--color-an); width: 100%; padding: 12px; border-radius: 8px; cursor: pointer; margin-bottom: 15px; font-weight: bold;}
+
+        .btn-main {
+            width: 100%; padding: 15px; background: var(--color-an); color: white;
+            border: none; border-radius: 8px; font-size: 1.1em; font-weight: bold; cursor: pointer; margin-bottom: 10px;
+        }
+        .btn-undo { background: var(--bg-card); border: 1px solid var(--border); color: var(--text-main); }
+        .btn-reset { background: transparent; color: var(--color-mom); font-size: 0.9em; padding: 10px; width: 100%; border: none; margin-top: 20px;}
+
+        #settingsModal {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: var(--bg-main); padding: 20px; z-index: 100; overflow-y: auto;
+        }
+        .setting-item {
+            display: flex; justify-content: space-between; align-items: center;
+            background: var(--bg-card); padding: 15px; border-radius: 8px; margin-bottom: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        .setting-item input {
+            width: 60px; padding: 8px; background: var(--bg-main); border: 1px solid var(--border);
+            color: var(--text-main); border-radius: 4px; text-align: center; font-size: 16px;
+        }
+
+        .history-log { font-size: 0.85em; color: var(--text-muted); padding: 10px; background: var(--bg-card); border-radius: 8px; max-height: 120px; overflow-y: auto; box-shadow: 0 2px 8px rgba(0,0,0,0.05);}
+        .log-item { border-bottom: 1px solid var(--border); padding: 5px 0; }
+        
+        option[value="nhat"] { color: var(--color-nhat); font-weight: bold;}
+        option[value="nhi"] { color: var(--color-nhi); }
+        option[value="ba"] { color: var(--color-ba); }
+        option[value="bet"] { color: var(--color-bet); }
+        option[value="mom"] { color: var(--color-mom); }
+    </style>
+</head>
+<body data-theme="dark">
+
+    <div class="container" id="setupScreen">
+        <div style="text-align: center; margin-bottom: 30px; position: relative;">
+            <div style="position: absolute; right: 0; top: 0;">
+                <button class="btn-icon" onclick="toggleTheme()" id="themeToggleBtnSetup">🌞</button>
+            </div>
+            <h1 style="color: var(--color-nhat); margin-top: 40px;">♠ Tá Lả Pro ♥</h1>
+            <p style="color: var(--text-muted);">Nhập tên 4 người chơi</p>
+        </div>
+        <input type="text" id="p0Name" class="setup-input" placeholder="Người chơi 1" value="Người 1">
+        <input type="text" id="p1Name" class="setup-input" placeholder="Người chơi 2" value="Người 2">
+        <input type="text" id="p2Name" class="setup-input" placeholder="Người chơi 3" value="Người 3">
+        <input type="text" id="p3Name" class="setup-input" placeholder="Người chơi 4" value="Người 4">
+        <button class="btn-main" onclick="startGame()">Vào Bàn</button>
+    </div>
+
+    <div class="container hidden" id="gameScreen">
+        <div class="header">
+            <h2>Bảng Điểm</h2>
+            <div class="header-actions">
+                <button class="btn-icon" onclick="toggleTheme()" id="themeToggleBtnGame">🌞</button>
+                <button class="btn-icon" onclick="openSettings()">⚙️</button>
+            </div>
+        </div>
+
+        <div class="score-board" id="scoreBoard"></div>
+
+        <div class="section-title">Thêm ván mới</div>
+        <div class="card">
+            
+            <div class="game-types">
+                <div class="type-btn active" data-type="thuong" onclick="setGameType('thuong')">Bình Thường</div>
+                <div class="type-btn" data-type="u" onclick="setGameType('u')">Ù</div>
+                <div class="type-btn" data-type="uden" onclick="setGameType('uden')">Ù Đền</div>
+            </div>
+
+            <div style="border-bottom: 1px dashed var(--border); padding-bottom: 15px; margin-bottom: 15px;">
+                <div id="eventsContainer"></div>
+                <button class="btn-add-event" onclick="addEventRow()">+ Bị Ăn Bài / Ăn Chốt</button>
+            </div>
+
+            <div id="inputThuong"></div>
+
+            <div id="inputU" class="hidden">
+                <div class="player-select-row">
+                    <span>Ai Ù? 🎉</span>
+                    <select id="uWinnerSelect"></select>
+                </div>
+            </div>
+
+            <div id="inputUDen" class="hidden">
+                <div class="player-select-row">
+                    <span>Ai Ù? 🎉</span>
+                    <select id="uDenWinnerSelect"></select>
+                </div>
+                <div class="player-select-row">
+                    <span>Ai Đền? 😭</span>
+                    <select id="uDenLoserSelect"></select>
+                </div>
+            </div>
+
+            <button class="btn-main" style="margin-top: 15px;" onclick="submitRound()">Ghi Điểm Ván Này</button>
+            <button class="btn-main btn-undo" id="btnUndo" onclick="undo()" disabled>Hoàn Tác Ván Trước</button>
+        </div>
+
+        <div class="section-title">Lịch sử</div>
+        <div class="history-log" id="historyLog"></div>
+
+        <button class="btn-reset" onclick="resetGame()">Xóa dữ liệu & Chơi lại từ đầu</button>
+    </div>
+
+    <div id="settingsModal" class="hidden">
+        <div class="header">
+            <h2>Thiết lập điểm</h2>
+            <button class="btn-icon" onclick="closeSettings()">Xong</button>
+        </div>
+
+        <div class="section-title">Phạt trong ván</div>
+        <div class="setting-item">
+            <div><strong>Ăn thường</strong><br><small style="color:var(--text-muted)">Bị ăn bài</small></div>
+            <input type="number" id="setAnThuong">
+        </div>
+        <div class="setting-item">
+            <div><strong>Ăn chốt</strong><br><small style="color:var(--text-muted)">Bị ăn bài chốt</small></div>
+            <input type="number" id="setAnChot">
+        </div>
+
+        <div class="section-title">Thắng cuộc</div>
+        <div class="setting-item">
+            <div><strong>Ù</strong><br><small style="color:var(--text-muted)">Thưởng từ mỗi người thua</small></div>
+            <input type="number" id="setU">
+        </div>
+
+        <div class="section-title">Xếp hạng & Đặc biệt</div>
+        <div class="setting-item">
+            <div><strong>Hạng Nhì</strong></div>
+            <input type="number" id="setNhi">
+        </div>
+        <div class="setting-item">
+            <div><strong>Hạng Ba</strong></div>
+            <input type="number" id="setBa">
+        </div>
+        <div class="setting-item">
+            <div><strong>Hạng Bét</strong></div>
+            <input type="number" id="setBet">
+        </div>
+        <div class="setting-item">
+            <div><strong>Móm</strong><br><small style="color:var(--text-muted)">Không có phỏm</small></div>
+            <input type="number" id="setMom">
+        </div>
+    </div>
+
+<script>
+    function toggleTheme() {
+        const body = document.body;
+        const currentTheme = body.getAttribute('data-theme');
+        const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+        
+        body.setAttribute('data-theme', newTheme);
+        localStorage.setItem('tala_pro_theme', newTheme);
+        updateThemeIcons(newTheme);
+    }
+
+    function updateThemeIcons(theme) {
+        const icon = theme === 'light' ? '🌙' : '🌞';
+        document.getElementById('themeToggleBtnSetup').innerText = icon;
+        document.getElementById('themeToggleBtnGame').innerText = icon;
+    }
+
+    function loadTheme() {
+        const savedTheme = localStorage.getItem('tala_pro_theme') || 'dark';
+        document.body.setAttribute('data-theme', savedTheme);
+        updateThemeIcons(savedTheme);
+    }
+
+    let players = [];
+    let historyStack = [];
+    let gameType = 'thuong'; 
+
+    let settings = {
+        anThuong: 0,
+        anChot: 4,
+        u: 5,
+        nhi: 1,
+        ba: 2,
+        bet: 3,
+        mom: 4
+    };
+
+    function init() {
+        loadTheme(); 
+        
+        const savedPlayers = localStorage.getItem('tala_pro_players');
+        const savedSettings = localStorage.getItem('tala_pro_settings');
+        const savedHistory = localStorage.getItem('tala_pro_history');
+
+        if (savedSettings) settings = JSON.parse(savedSettings);
+
+        if (savedPlayers) {
+            players = JSON.parse(savedPlayers);
+            historyStack = savedHistory ? JSON.parse(savedHistory) : [];
+            document.getElementById('setupScreen').classList.add('hidden');
+            document.getElementById('gameScreen').classList.remove('hidden');
+            renderUI();
+        }
+    }
+
+    function startGame() {
+        players = [];
+        for(let i=0; i<4; i++) {
+            const name = document.getElementById(`p${i}Name`).value || `Người ${i+1}`;
+            players.push({ id: i, name: name, score: 0 });
+        }
+        
+        document.getElementById('setupScreen').classList.add('hidden');
+        document.getElementById('gameScreen').classList.remove('hidden');
+        saveData();
+        renderUI();
+    }
+
+    function renderUI() {
+        const board = document.getElementById('scoreBoard');
+        board.innerHTML = '';
+        players.forEach(p => {
+            let scoreClass = p.score > 0 ? 'text-positive' : (p.score < 0 ? 'text-negative' : 'text-zero');
+            let scoreStr = p.score > 0 ? `+${p.score}` : p.score;
+            board.innerHTML += `
+                <div class="score-row">
+                    <span class="name">${p.name}</span>
+                    <span class="${scoreClass}">${scoreStr}</span>
+                </div>
+            `;
+        });
+
+        let playerOptions = players.map(p => `<option value="${p.id}">${p.name}</option>`).join('');
+
+        document.getElementById('uWinnerSelect').innerHTML = playerOptions;
+        document.getElementById('uDenWinnerSelect').innerHTML = playerOptions;
+        document.getElementById('uDenLoserSelect').innerHTML = playerOptions;
+
+        const inputThuong = document.getElementById('inputThuong');
+        inputThuong.innerHTML = '';
+        players.forEach((p, idx) => {
+            let sel = `<select id="rank-${p.id}">
+                <option value="nhat" ${idx===0?'selected':''}>🥇 Nhất (+)</option>
+                <option value="nhi" ${idx===1?'selected':''}>🥈 Nhì (-${settings.nhi})</option>
+                <option value="ba" ${idx===2?'selected':''}>🥉 Ba (-${settings.ba})</option>
+                <option value="bet" ${idx===3?'selected':''}>💩 Bét (-${settings.bet})</option>
+                <option value="mom">🔥 Móm (-${settings.mom})</option>
+            </select>`;
+            inputThuong.innerHTML += `<div class="player-select-row"><span>${p.name}</span>${sel}</div>`;
+        });
+
+        document.getElementById('btnUndo').disabled = historyStack.length === 0;
+    }
+
+    function setGameType(type) {
+        gameType = type;
+        document.querySelectorAll('.type-btn').forEach(btn => btn.classList.remove('active'));
+        document.querySelector(`.type-btn[data-type="${type}"]`).classList.add('active');
+
+        document.getElementById('inputThuong').classList.add('hidden');
+        document.getElementById('inputU').classList.add('hidden');
+        document.getElementById('inputUDen').classList.add('hidden');
+
+        if (type === 'thuong') document.getElementById('inputThuong').classList.remove('hidden');
+        if (type === 'u') document.getElementById('inputU').classList.remove('hidden');
+        if (type === 'uden') document.getElementById('inputUDen').classList.remove('hidden');
+    }
+
+    function addEventRow() {
+        const container = document.getElementById('eventsContainer');
+        const rowId = Date.now();
+        let playerOptions = players.map(p => `<option value="${p.id}">${p.name}</option>`).join('');
+        
+        const rowHTML = `
+            <div class="event-row" id="ev-${rowId}">
+                <select class="ev-eater">${playerOptions}</select>
+                <select class="ev-type">
+                    <option value="an">Ăn (${settings.anThuong})</option>
+                    <option value="anchot">Ăn Chốt (${settings.anChot})</option>
+                </select>
+                <select class="ev-eaten">${playerOptions}</select>
+                <button class="btn-remove-event" onclick="document.getElementById('ev-${rowId}').remove()">X</button>
+            </div>
+        `;
+        container.insertAdjacentHTML('beforeend', rowHTML);
+    }
+
+    function submitRound() {
+        historyStack.push(JSON.parse(JSON.stringify(players)));
+        
+        const eventRows = document.querySelectorAll('.event-row');
+        let logText = [];
+
+        eventRows.forEach(row => {
+            const eaterId = parseInt(row.querySelector('.ev-eater').value);
+            const eatenId = parseInt(row.querySelector('.ev-eaten').value);
+            const type = row.querySelector('.ev-type').value;
+
+            if (eaterId === eatenId) return;
+
+            const pEater = players.find(p => p.id === eaterId);
+            const pEaten = players.find(p => p.id === eatenId);
+            
+            let points = type === 'an' ? settings.anThuong : settings.anChot;
+            
+            if (points > 0) {
+                pEater.score += points;
+                pEaten.score -= points;
+                let actionName = type === 'an' ? "ăn bài" : "ăn chốt";
+                logText.push(`${pEater.name} ${actionName} ${pEaten.name}`);
+            }
+        });
+
+        if (gameType === 'u') {
+            const winnerId = parseInt(document.getElementById('uWinnerSelect').value);
+            let totalGain = 0;
+            players.forEach(p => {
+                if (p.id !== winnerId) {
+                    p.score -= settings.u;
+                    totalGain += settings.u;
+                }
+            });
+            players.find(p => p.id === winnerId).score += totalGain;
+            logText.push(`${players.find(p=>p.id===winnerId).name} Ù`);
+
+        } else if (gameType === 'uden') {
+            const winnerId = parseInt(document.getElementById('uDenWinnerSelect').value);
+            const loserId = parseInt(document.getElementById('uDenLoserSelect').value);
+            
+            if(winnerId === loserId) {
+                alert("Người Ù và Người Đền không thể là một!");
+                historyStack.pop(); return;
+            }
+
+            const totalLoss = settings.u * 3; 
+            players.find(p => p.id === winnerId).score += totalLoss;
+            players.find(p => p.id === loserId).score -= totalLoss;
+            
+            logText.push(`${players.find(p=>p.id===winnerId).name} Ù - ${players.find(p=>p.id===loserId).name} Đền`);
+
+        } else if (gameType === 'thuong') {
+            let nhatCount = 0;
+            let nhatPlayer = null;
+            let totalPenalties = 0;
+
+            players.forEach(p => {
+                const rank = document.getElementById(`rank-${p.id}`).value;
+                if (rank === 'nhat') {
+                    nhatCount++;
+                    nhatPlayer = p;
+                } else {
+                    let penalty = 0;
+                    if (rank === 'nhi') penalty = settings.nhi;
+                    if (rank === 'ba') penalty = settings.ba;
+                    if (rank === 'bet') penalty = settings.bet;
+                    if (rank === 'mom') penalty = settings.mom;
+                    
+                    p.score -= penalty;
+                    totalPenalties += penalty;
+                }
+            });
+
+            if (nhatCount !== 1) {
+                alert("Lỗi: Ván thường phải có ĐÚNG 1 người về Nhất!");
+                players = historyStack.pop(); return;
+            }
+
+            nhatPlayer.score += totalPenalties;
+            logText.push(`${nhatPlayer.name} Nhất`);
+        }
+
+        addLog(logText.join(' | '));
+        document.getElementById('eventsContainer').innerHTML = ''; 
+        
+        saveData();
+        renderUI();
+    }
+
+    function undo() {
+        if(historyStack.length === 0) return;
+        players = historyStack.pop();
+        
+        const logDiv = document.getElementById('historyLog');
+        if (logDiv.firstChild) logDiv.removeChild(logDiv.firstChild);
+
+        saveData();
+        renderUI();
+    }
+
+    function addLog(msg) {
+        const logDiv = document.getElementById('historyLog');
+        const div = document.createElement('div');
+        div.className = 'log-item';
+        div.innerText = `Ván ${historyStack.length}: ${msg || "Không có sự kiện"}`;
+        logDiv.insertBefore(div, logDiv.firstChild);
+    }
+
+    function openSettings() {
+        document.getElementById('settingsModal').classList.remove('hidden');
+        document.getElementById('setAnThuong').value = settings.anThuong;
+        document.getElementById('setAnChot').value = settings.anChot;
+        document.getElementById('setU').value = settings.u;
+        document.getElementById('setNhi').value = settings.nhi;
+        document.getElementById('setBa').value = settings.ba;
+        document.getElementById('setBet').value = settings.bet;
+        document.getElementById('setMom').value = settings.mom;
+    }
+
+    function closeSettings() {
+        settings.anThuong = parseInt(document.getElementById('setAnThuong').value) || 0;
+        settings.anChot = parseInt(document.getElementById('setAnChot').value) || 0;
+        settings.u = parseInt(document.getElementById('setU').value) || 0;
+        settings.nhi = parseInt(document.getElementById('setNhi').value) || 0;
+        settings.ba = parseInt(document.getElementById('setBa').value) || 0;
+        settings.bet = parseInt(document.getElementById('setBet').value) || 0;
+        settings.mom = parseInt(document.getElementById('setMom').value) || 0;
+        
+        document.getElementById('settingsModal').classList.add('hidden');
+        localStorage.setItem('tala_pro_settings', JSON.stringify(settings));
+        renderUI(); 
+    }
+
+    function saveData() {
+        localStorage.setItem('tala_pro_players', JSON.stringify(players));
+        localStorage.setItem('tala_pro_history', JSON.stringify(historyStack));
+    }
+
+    function resetGame() {
+        if(confirm("Xóa hoàn toàn lịch sử và tạo lại từ đầu?")) {
+            localStorage.removeItem('tala_pro_players');
+            localStorage.removeItem('tala_pro_history');
+            location.reload();
+        }
+    }
+
+    init();
+
+</script>
+</body>
+</html>
