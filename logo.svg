@@ -29,6 +29,6 @@
   <circle cx="72" cy="82" r="2" fill="#e74c3c"/>
   
   <!-- Playing cards symbols -->
-  <text x="40" y="140" font-size="20" fill="#e74c3c">♥</text>
-  <text x="145" y="140" font-size="20" fill="#000">♠</text>
+  <text x="40" y="140" font-size="20" fill="#e74c3c" aria-hidden="true">♥</text>
+  <text x="145" y="140" font-size="20" fill="#000" aria-hidden="true">♠</text>
 </svg>
