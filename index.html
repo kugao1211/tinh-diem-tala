@@ -70,7 +70,12 @@
             color: var(--text-main); border-radius: 8px; font-size: 16px;
         }
         
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .header { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            margin-bottom: 20px; 
+        }
         .header h2 { margin: 0; font-size: 1.5em; }
         .header-actions { display: flex; gap: 8px; }
         .btn-icon { 
@@ -147,6 +152,40 @@
         option[value="ba"] { color: var(--color-ba); }
         option[value="bet"] { color: var(--color-bet); }
         option[value="mom"] { color: var(--color-mom); }
+
+        /* Layout 2 cột cho màn hình ngang */
+        @media (min-width: 768px) {
+            .container {
+                max-width: 1200px;
+                padding: 20px;
+            }
+            
+            #gameScreen {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 20px;
+                align-items: flex-start;
+            }
+            
+            .header {
+                flex: 1 1 100%;
+            }
+            
+            .left-column {
+                flex: 0 0 350px;
+                position: sticky;
+                top: 20px;
+            }
+            
+            .right-column {
+                flex: 1;
+                min-width: 0;
+            }
+            
+            .score-board {
+                margin-bottom: 0;
+            }
+        }
     </style>
 </head>
 <body data-theme="dark">
@@ -174,52 +213,54 @@
                 <button class="btn-icon" onclick="openSettings()">⚙️</button>
             </div>
         </div>
-
-        <div class="score-board" id="scoreBoard">
-            </div>
-
-        <div class="section-title">Thêm ván mới</div>
-        <div class="card">
-            
-            <div class="game-types">
-                <div class="type-btn active" data-type="thuong" onclick="setGameType('thuong')">Bình Thường</div>
-                <div class="type-btn" data-type="u" onclick="setGameType('u')">Ù</div>
-                <div class="type-btn" data-type="uden" onclick="setGameType('uden')">Ù Đền</div>
-            </div>
-
-            <div style="border-bottom: 1px dashed var(--border); padding-bottom: 15px; margin-bottom: 15px;">
-                <div id="eventsContainer"></div>
-                <button class="btn-add-event" onclick="addEventRow()">+ Bị Ăn Bài / Ăn Chốt</button>
-            </div>
-
-            <div id="inputThuong"></div>
-
-            <div id="inputU" class="hidden">
-                <div class="player-select-row">
-                    <span>Ai Ù? 🎉</span>
-                    <select id="uWinnerSelect"></select>
-                </div>
-            </div>
-
-            <div id="inputUDen" class="hidden">
-                <div class="player-select-row">
-                    <span>Ai Ù? 🎉</span>
-                    <select id="uDenWinnerSelect"></select>
-                </div>
-                <div class="player-select-row">
-                    <span>Ai Đền? 😭</span>
-                    <select id="uDenLoserSelect"></select>
-                </div>
-            </div>
-
-            <button class="btn-main" style="margin-top: 15px;" onclick="submitRound()">Ghi Điểm Ván Này</button>
-            <button class="btn-main btn-undo" id="btnUndo" onclick="undo()" disabled>Hoàn Tác Ván Trước</button>
+        
+        <div class="left-column">
+            <div class="score-board" id="scoreBoard"></div>
         </div>
+        
+        <div class="right-column">
+            <div class="section-title">Thêm ván mới</div>
+            <div class="card">
+                <div class="game-types">
+                    <div class="type-btn active" data-type="thuong" onclick="setGameType('thuong')">Bình Thường</div>
+                    <div class="type-btn" data-type="u" onclick="setGameType('u')">Ù</div>
+                    <div class="type-btn" data-type="uden" onclick="setGameType('uden')">Ù Đền</div>
+                </div>
 
-        <div class="section-title">Lịch sử</div>
-        <div class="history-log" id="historyLog"></div>
+                <div style="border-bottom: 1px dashed var(--border); padding-bottom: 15px; margin-bottom: 15px;">
+                    <div id="eventsContainer"></div>
+                    <button class="btn-add-event" onclick="addEventRow()">+ Bị Ăn Bài / Ăn Chốt</button>
+                </div>
 
-        <button class="btn-reset" onclick="resetGame()">Xóa dữ liệu & Chơi lại từ đầu</button>
+                <div id="inputThuong"></div>
+
+                <div id="inputU" class="hidden">
+                    <div class="player-select-row">
+                        <span>Ai Ù? 🎉</span>
+                        <select id="uWinnerSelect"></select>
+                    </div>
+                </div>
+
+                <div id="inputUDen" class="hidden">
+                    <div class="player-select-row">
+                        <span>Ai Ù? 🎉</span>
+                        <select id="uDenWinnerSelect"></select>
+                    </div>
+                    <div class="player-select-row">
+                        <span>Ai Đền? 😭</span>
+                        <select id="uDenLoserSelect"></select>
+                    </div>
+                </div>
+
+                <button class="btn-main" style="margin-top: 15px;" onclick="submitRound()">Ghi Điểm Ván Này</button>
+                <button class="btn-main btn-undo" id="btnUndo" onclick="undo()" disabled>Hoàn Tác Ván Trước</button>
+            </div>
+
+            <div class="section-title">Lịch sử</div>
+            <div class="history-log" id="historyLog"></div>
+
+            <button class="btn-reset" onclick="resetGame()">Xóa dữ liệu & Chơi lại từ đầu</button>
+        </div>
     </div>
 
     <div id="settingsModal" class="hidden">
