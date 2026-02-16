@@ -186,6 +186,28 @@
                 margin-bottom: 0;
             }
         }
+
+        /* Logo styling */
+        .game-logo {
+            width: 220px;
+            height: auto;
+            display: block;
+            margin: 0 auto 20px auto;
+            border-radius: 16px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            animation: fadeIn 0.6s ease-in;
+        }
+
+        @media (max-width: 480px) {
+            .game-logo {
+                width: 160px;
+            }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
     </style>
 </head>
 <body data-theme="dark">
@@ -195,6 +217,9 @@
             <div style="position: absolute; right: 0; top: 0;">
                 <button class="btn-icon" onclick="toggleTheme()" id="themeToggleBtnSetup">🌞</button>
             </div>
+            <!-- Logo: Please add logo.png file to root directory -->
+            <img src="logo.png" alt="Tính Điểm Phỏm Logo" class="game-logo" onerror="this.style.display='none'">
+            
             <h1 style="color: var(--color-nhat); margin-top: 40px;">♠ Tá Lả Pro ♥</h1>
             <p style="color: var(--text-muted);">Nhập tên 4 người chơi</p>
         </div>
